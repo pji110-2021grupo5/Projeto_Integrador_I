@@ -126,7 +126,7 @@ def materias():
 #Conexao()
 
 #Chama a função que faz o Scraper do site ( nomes partidos e contatos dos vereadores )
-#Nomes()
+Nomes()
 
 #Chama a função que faz o Scraper das matérias ( matérias legislativas )
 materias()
