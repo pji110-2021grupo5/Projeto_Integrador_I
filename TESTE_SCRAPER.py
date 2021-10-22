@@ -3,14 +3,12 @@ from re import sub,compile
 from bs4 import BeautifulSoup
 import requests
 import re
-
-#import scrapy
-#import urllib
-#import json
-
 import mysql.connector
 from mysql.connector import Error
 from requests.models import HTTPError
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
 #*********** Abre a conexão com o Banco de Dados ***********
 
@@ -90,14 +88,7 @@ def Nomes():
         except Error as erro:
             print('Registros já existem no Banco de Dados: {}'.format(erro))
 
-        ''' 
-        #Grava o Array num arquivo no formato JSON:
-            with open('posts.json','w',encoding='utf-8') as json_file:
-                json.dump(all_post,json_file,sort_keys = True, indent = 4,
-                           ensure_ascii = False)
-        '''
-
-
+       
 def materias():
 
     i = 1
@@ -120,16 +111,53 @@ def materias():
             for j in range(len(info_materias)):
                 materias = info_materias[j].text.replace("\n","")
                 print(materias+'\n'+info_texto[j].text)
-            
+
+
+def paginas():
+
+    options = Options()
+    options.add_argument("--headless")
+    driver = webdriver.Chrome(r"/home/milenna/Área de Trabalho/Estudos do Papai/Projeto Integrador I/chromedriver",options=options)
+    # implicit wait for 5 seconds
+    driver.implicitly_wait(5)
+    # maximize with maximize_window()
+    # driver.maximize_window()
+
+    driver.get('http://www.camarasorocaba.sp.gov.br/materias.html')
+    html = requests.get('http://www.camarasorocaba.sp.gov.br/materias.html').content
+    for i in range(1, 3):
+        pagina = "<a href=\"javascript: postPesquisaMateria('1')\">1</a>"
+        proxima_pagina = f"<a href=\"javascript:postPesquisaMateria('{i}')\">{i}</a>"
+        # identify element with title attribute and click()
+        l = driver.find_element(By.XPATH, f"/html/body/div[2]/div[3]/section[2]/div/div/div/div/div[7]/ul/li[{i}]/a")
+        l.click()
+        print("Pagina %d " % i)
+
+        html.decode('utf-8')
+        soup = BeautifulSoup(html, 'html.parser')
+        info_materias = soup.find_all(class_="sec-info")
+        info_texto = soup.find_all(class_="headline")
+        #paginas = [a['href'] for a in soup.find_all('a', href=True)] 
+        paginas = [a['href'] for a in soup.select('a[href]')] #Lista todas as páginas
+        #pag = re.findall(r'\d+', paginas[142])[0] # Encontra qual é o número da última página para fazer o for externo
+
+        #for i in range(int(pag)):
+        for j in range(len(info_materias)):
+            materias = info_materias[j].text.replace("\n","")
+            print(materias+'\n'+info_texto[j].text)
+
+    driver.quit()            
 
 #Chama a função para conectar com o Banco de Dados "sakila"
 #Conexao()
 
 #Chama a função que faz o Scraper do site ( nomes partidos e contatos dos vereadores )
-Nomes()
+#Nomes()
 
 #Chama a função que faz o Scraper das matérias ( matérias legislativas )
-materias()
+#materias()
+
+paginas()
 
 #Fecha_Con()
 
