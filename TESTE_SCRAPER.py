@@ -16,18 +16,39 @@ def Conexao():
     global cursor
     global con
     try:
-        con = mysql.connector.connect(host='localhost',database='univesp',user='univesp',password='univesp')
+        #con = mysql.connector.connect(host='localhost',database='univesp',user='univesp',password='univesp')
+        con = mysql.connector.connect(host='localhost',database='univesp',user='root',password='univesp')
         #Cria tabela no Banco MySql
-        #nome_vereadores = "CREATE TABLE nome_vereadores(IdVereador int(12) not null,NomeVereador VARCHAR(50) not null,SobreNome VARCHAR(80),PRIMARY KEY (IdVereador))"
-        #part_vereadores = "CREATE TABLE part_vereadores(IdVereador int(12) not null,PartidoVereador VARCHAR(40) not null,GabineteVereador VARCHAR(30),PRIMARY KEY (IdVereador))"
+        nome_vereadores = "CREATE TABLE nome_vereadores(IdVereador int(12) not null,NomeVereador VARCHAR(50) not null,SobreNome VARCHAR(80),PRIMARY KEY (IdVereador))"
+        part_vereadores = "CREATE TABLE part_vereadores(IdVereador int(12) not null,PartidoVereador VARCHAR(40) not null,GabineteVereador VARCHAR(30),PRIMARY KEY (IdVereador))"
+        
         contato_vereadores = "CREATE TABLE contato_vereadores(IdVereador int(12) not null,"\
                              "Telefone_gab VARCHAR(30),E_mail VARCHAR(50),Facebook VARCHAR(50),"\
                              "Instagram VARCHAR(50),Site VARCHAR(130),Whats VARCHAR(30),"\
                              "PRIMARY KEY (IdVereador))"
-        #Cria cursor e executa SQL no banco
+        
+        
+        tables = ['nome_vereadores','part_vereadores','contato_vereadores']
+        
+        Qry = "SHOW TABLES"
         cursor = con.cursor()
+        cursor.execute(Qry)
+        #results = cursor.fetchall()
+        
+        #print('All existing tables:', results) # Returned as a list of tuples
+        
+        #results_list = [item[0] for item in results] # Conversion to list of str
+        results_list = [i[0] for i in cursor.fetchall()]
+        
+        if tables in results_list:
+            print(tables, 'was found!')
+        else:
+            print(tables, 'was NOT found!')
+
+        #Cria cursor e executa SQL no banco
+        #cursor = con.cursor()
         #cursor.execute(nome_vereadores,part_vereadores,contato_vereadores)
-        cursor.execute(contato_vereadores)
+        #cursor.execute(contato_vereadores)
         
     except Error as erro:
         print('Falha na conexão com o banco de dados: {}'.format(erro))
@@ -50,7 +71,7 @@ def Nomes():
     html.decode('utf-8')
     soup = BeautifulSoup(html, 'html.parser')
     vereadores = soup.find_all(class_="sec-info")
-    part = gab = tel = email = face = insta = site = whats = ""
+    part = gab = tel = email = face = insta = site = whats = " "
     
     for i in range(0,len(vereadores)):
         data = vereadores[i].text.replace("\n","").split()
@@ -149,7 +170,7 @@ def paginas():
     driver.quit()            
 
 #Chama a função para conectar com o Banco de Dados "sakila"
-#Conexao()
+Conexao()
 
 #Chama a função que faz o Scraper do site ( nomes partidos e contatos dos vereadores )
 #Nomes()
@@ -157,7 +178,7 @@ def paginas():
 #Chama a função que faz o Scraper das matérias ( matérias legislativas )
 #materias()
 
-paginas()
+#paginas()
 
 #Fecha_Con()
 
