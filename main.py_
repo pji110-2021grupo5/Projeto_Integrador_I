@@ -1,0 +1,20 @@
+# -*- coding: utf-8 -*-
+__author__ = "pji110-2021grupo5"
+__copyright__ = "Copyright 2007, The Cogent Project"
+__credits__ = ["https://github.com/pji110-2021grupo5/pji110-2021grupo5"]
+__license__ = "GNU General Public License v3.0"
+__version__ = "1.0"
+__maintainer__ = "pji110-2021grupo5"
+__email__ = "pji110-2021grupo5@gmail.com"
+__status__ = "Development"
+
+from TESTE_SCRAPER import Teste_Scraper
+obj = Teste_Scraper()
+obj.Conexao()
+
+'''
+from captura_materias import captura_materias
+obj = captura_materias()
+obj.Iniciar()
+#obj.gravar_informacoes()
+'''
