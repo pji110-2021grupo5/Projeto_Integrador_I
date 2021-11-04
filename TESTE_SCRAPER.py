@@ -1,4 +1,4 @@
-from logging import error
+#from logging import error
 from re import sub,compile
 from bs4 import BeautifulSoup
 import requests
@@ -22,7 +22,7 @@ class Teste_Scraper:
         try:
             con = mysql.connector.connect(host='localhost',database='univesp',user='univesp',password='univesp')
             #Cria tabela no Banco MySql
-            #nome_vereadores = "CREATE TABLE nome_vereadores(IdVereador int(12) not null,NomeVereador VARCHAR(50) not null,SobreNome VARCHAR(80),PRIMARY KEY (IdVereador))"
+            #nome_vereadores = "CREATE TABLE nome_vereadores(IdVereador int(12) not null,NomeVereador VARCHAR(50) not null,nome_vereador VARCHAR(80),PRIMARY KEY (IdVereador))"
             #part_vereadores = "CREATE TABLE part_vereadores(IdVereador int(12) not null,PartidoVereador VARCHAR(40) not null,GabineteVereador VARCHAR(30),PRIMARY KEY (IdVereador))"
             
             tables = "SHOW TABLES FROM UNIVESP"
@@ -47,7 +47,7 @@ class Teste_Scraper:
             elif 'nome_vereadores' not in result:
                   nome_vereadores = "CREATE TABLE nome_vereadores(IdVereador int(12) not null,\
                                                                   NomeVereador VARCHAR(50) not null,\
-                                                                  SobreNome VARCHAR(80),\
+                                                                  nome_vereador VARCHAR(80),\
                                                                   PRIMARY KEY (IdVereador))"
                   cursor.execute(nome_vereadores)
             elif 'part_vereadores' not in result:
@@ -56,16 +56,15 @@ class Teste_Scraper:
                                                                 GabineteVereador VARCHAR(30),\
                                                                 PRIMARY KEY (IdVereador))"
                 cursor.execute(part_vereadores)
-            elif 'materias' not in result:
-                materias_vereadores = "CREATE TABLE materias_vereadores(IdMateria int(12) not null,\
+            elif 'materias_vereadores' not in result:
+                materias_vereadores = "CREATE TABLE materias_vereadores(IdMateria int not null AUTO_INCREMENT,\
                                                                         TituloMateria VARCHAR(20) not null,\
-                                                                        TextoMateria VARCHAR(250), \
+                                                                        TextoMateria VARCHAR(200), \
                                                                         DataMateria VARCHAR(10),\
                                                                         TipoMateria VARCHAR(20),\
                                                                         AutorMateria VARCHAR(50),\
                                                                         SituacaoMateria VARCHAR(30),\
-                                                                        PRIMARY KEY (IdMateria),\
-                                                                        FOREIGN KEY (AutorMateria))"
+                                                                        PRIMARY KEY (IdMateria))"
                 cursor.execute(materias_vereadores)    
             else:
                 print('o Banco de dados já possui as tabelas:'+str(result)+' criadas')
@@ -115,15 +114,11 @@ class Teste_Scraper:
                     whats = data[j+1]+" "+data[j+2]
 
             try:
-                insere3 = "insert into univesp.contato_vereadores (IdVereador,Telefone_gab,"\
+                insere_contato = "insert into univesp.contato_vereadores (IdVereador,Telefone_gab,"\
                           "E_mail,Facebook,Instagram,Site,Whats)"\
                           "values ("+str(i+1)+",'"+tel+"','"+email+"','"+face+"','"+insta+"','"+site+"','"+whats+"')"
-                #insere2 = "insert into univesp.part_vereadores (IdVereador,PartidoVereador,GabineteVereador) values ("+str(i+1)+",'"+part+"','"+gab+"')"
-                #"insert into univesp.part_vereadores (IdVereador,PartidoVereador,GabineteVereador) values ("+str(i+1)+"','"+part+"','"+gab+"')'"
-
-                #"insert into univesp.part_vereadores (IdVereador,PartidoVereador,GabineteVereador) values ("+str(i+1)+",'"+all_part[i].split("\r\n",1)[0]+"','"+all_part[j].split("\r\n",1)[0]+"')"
-                #cursor.execute(insere1,insere2)
-                cursor.execute(insere3)
+                
+                cursor.execute(insere_contato)
                 con.commit()
 
             except Error as erro:
@@ -134,6 +129,7 @@ class Teste_Scraper:
 
         i = 1
         j = 1
+        nome_vereador = ""
         
         try:
             html = requests.get('http://www.camarasorocaba.sp.gov.br/materias.html').content
@@ -144,24 +140,52 @@ class Teste_Scraper:
             soup = BeautifulSoup(html, 'html.parser')
             info_materias = soup.find_all(class_="sec-info")
             info_texto = soup.find_all(class_="headline")
-            #paginas = [a['href'] for a in soup.find_all('a', href=True)] 
-            #paginas = [a['href'] for a in soup.select('a[href]')] #Lista todas as páginas
-            #pag = re.findall(r'\d+', paginas[141])[0] # Encontra qual é o número da última página ( paginas[142] ) para fazer o for externo
+            
+            #print(materias+'\n'+info_texto[j].text)
 
-            #for i in range(int(pag)):
             for j in range(len(info_materias)):
                 materias = info_materias[j].text.replace("\n","")
-                print(materias+'\n'+info_texto[j].text)
+                m = materias.split()
+                nome_vereador = ''
+                
+                #for k in range(len(m)):
+                print(m[0]+' - '+m[1])                              # TituloMateria
+                print(m[2])                                         # DataMateria
+                print(m[3])                                         # TipoMateria
+                #-----------------------------------------------------------------------------    
+                for l in range(5,len(m)):
+                    if m[l] != 'Situação:':
+                        nome_vereador = nome_vereador+' '+m[l]
+                    else:
+                        break
+                print(nome_vereador.strip())                                # AutorMateria
+                #-----------------------------------------------------------------------------    
+                q = 0
+                #for p in range(l,len(m)):
+                p = l
+                resto = m[p]
+                for s in range(p, len(m)-1):
+                    q = q+1
+                    resto = resto + ' ' + m[p+q]
+                print(resto)                                                # TextoMateria
+                #-----------------------------------------------------------------------------    
+                #    Inserir os dados ( values ) na tabela materias_vereadores
+                #-----------------------------------------------------------------------------    
+                materias_vereadores = "insert into materias_vereadores(TituloMateria,TextoMateria,DataMateria,\
+                                                                        TipoMateria,AutorMateria,SituacaoMateria)\
+                                       values('"+m[0]+' - '+m[1]+"')"
+                #-----------------------------------------------------------------------------    
+
             
 
     #Chama a função para conectar com o Banco de Dados "sakila"
     Conexao()
 
     #Chama a função que faz o Scraper do site ( nomes partidos e contatos dos vereadores )
-    #Nomes()
+    Nomes()
 
     #Chama a função que faz o Scraper das matérias ( matérias legislativas )
-    #materias()
+    materias()
 
     Fecha_Con()
 
