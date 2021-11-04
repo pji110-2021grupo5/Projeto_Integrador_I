@@ -7,6 +7,7 @@ import requests
 from requests.models import HTTPError
 
 #from TESTE_SCRAPER import Teste_Scraper
+
 i=0
 titulo = []
 data_materia = []
