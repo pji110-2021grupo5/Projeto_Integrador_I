@@ -25,7 +25,7 @@ class Teste_Scraper:
             #nome_vereadores = "CREATE TABLE nome_vereadores(IdVereador int(12) not null,NomeVereador VARCHAR(50) not null,nome_vereador VARCHAR(80),PRIMARY KEY (IdVereador))"
             #part_vereadores = "CREATE TABLE part_vereadores(IdVereador int(12) not null,PartidoVereador VARCHAR(40) not null,GabineteVereador VARCHAR(30),PRIMARY KEY (IdVereador))"
             
-            tables = "SHOW TABLES FROM UNIVESP"
+            tables = "SHOW TABLES FROM UNIVESP;"
             #Cria cursor e executa SQL no banco
             cursor = con.cursor()
             cursor.execute(tables)
@@ -42,19 +42,19 @@ class Teste_Scraper:
                                                                       Instagram VARCHAR(50),\
                                                                       Site VARCHAR(130),\
                                                                       Whats VARCHAR(30),\
-                                                                      PRIMARY KEY (IdVereador))"
+                                                                      PRIMARY KEY (IdVereador));"
                 cursor.execute(contato_vereadores)
             elif 'nome_vereadores' not in result:
                   nome_vereadores = "CREATE TABLE nome_vereadores(IdVereador int(12) not null,\
                                                                   NomeVereador VARCHAR(50) not null,\
                                                                   nome_vereador VARCHAR(80),\
-                                                                  PRIMARY KEY (IdVereador))"
+                                                                  PRIMARY KEY (IdVereador));"
                   cursor.execute(nome_vereadores)
             elif 'part_vereadores' not in result:
                 part_vereadores = "CREATE TABLE part_vereadores(IdVereador int(12) not null,\
                                                                 PartidoVereador VARCHAR(40) not null,\
                                                                 GabineteVereador VARCHAR(30),\
-                                                                PRIMARY KEY (IdVereador))"
+                                                                PRIMARY KEY (IdVereador));"
                 cursor.execute(part_vereadores)
             elif 'materias_vereadores' not in result:
                 materias_vereadores = "CREATE TABLE materias_vereadores(IdMateria int not null AUTO_INCREMENT,\
@@ -64,7 +64,7 @@ class Teste_Scraper:
                                                                         TipoMateria VARCHAR(20),\
                                                                         AutorMateria VARCHAR(50),\
                                                                         SituacaoMateria VARCHAR(30),\
-                                                                        PRIMARY KEY (IdMateria))"
+                                                                        PRIMARY KEY (IdMateria));"
                 cursor.execute(materias_vereadores)    
             else:
                 print('o Banco de dados já possui as tabelas:'+str(result)+' criadas')
@@ -147,7 +147,6 @@ class Teste_Scraper:
                 materias = info_materias[j].text.replace("\n","")
                 m = materias.split()
                 nome_vereador = ''
-                
                 #for k in range(len(m)):
                 print(m[0]+' - '+m[1])                              # TituloMateria
                 print(m[2])                                         # DataMateria
@@ -168,14 +167,21 @@ class Teste_Scraper:
                     q = q+1
                     resto = resto + ' ' + m[p+q]
                 print(resto)                                                # TextoMateria
-                #-----------------------------------------------------------------------------    
-                #    Inserir os dados ( values ) na tabela materias_vereadores
-                #-----------------------------------------------------------------------------    
-                materias_vereadores = "insert into materias_vereadores(TituloMateria,TextoMateria,DataMateria,\
-                                                                        TipoMateria,AutorMateria,SituacaoMateria)\
-                                       values('"+m[0]+' - '+m[1]+"')"
-                #-----------------------------------------------------------------------------    
 
+
+                try:            
+                    #-----------------------------------------------------------------------------    
+                    #    Inserir os dados ( values ) na tabela materias_vereadores
+                    #----------------------------------------------------------------------------- 
+                    materias_vereadores = "insert into materias_vereadores(TituloMateria,TextoMateria,DataMateria,\
+                                                                            TipoMateria,AutorMateria,SituacaoMateria)\
+                                           values('"+m[0]+' - '+m[1]+"','"+info_texto[j].text+"','"+m[2]+"','"+m[3]+"','"\
+                                                    +nome_vereador.strip()+"','"+resto+"'"+")"
+                    cursor.execute(materias_vereadores)
+                    con.commit()
+                    #-----------------------------------------------------------------------------      
+                except Error as erro:
+                    print('Registros já existem no Banco de Dados: {}'.format(erro))
             
 
     #Chama a função para conectar com o Banco de Dados "sakila"
