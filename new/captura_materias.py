@@ -21,6 +21,7 @@ class materias:
         self.driver       = webdriver.Chrome(chrome_options=options) #webdriver.Chrome()
         self.driver.implicitly_wait(5)
         self.titulo       = []
+        self.texto_materia= []
         self.texto1       = []
         self.data_materia = []
         self.tipo_materia = []
@@ -52,10 +53,11 @@ class materias:
     def gravar_informacoes(self, titulo_da_materia, texto_da_materia, dados_de_apresentacao_materia):
         for i in range(0, len(titulo_da_materia)):
             self.title = titulo_da_materia[i].text.split(" ")  # Separa texto em lista
-            #self.title = self.title[0]  # Seleciona somente uma informaçao da lista
+            self.title = self.title[1]  # Seleciona somente uma informaçao da lista
             self.titulo.append(self.title)
 
             self.txt_materia = texto_da_materia[i].text
+            self.texto_materia.append(self.txt_materia)
             
             itens = 0
             
@@ -78,16 +80,13 @@ class materias:
                 self.situacao.append(self.condition)
                 itens += 1
             
-            #print("Titulo: "          , self.titulo      )
-            print("Data: "            , self.data_materia)
-            print("Tipo: "            , self.tipo_materia)
-            print("Autor: "           , self.autor       )
-            print("Situaçao: "        , self.situacao    )
-        
         print("Titulo: "          , self.titulo      )
-        print("Texto da Matéria: ", self.txt_materia )
-
-            #print('************************ Página %d ************************'%i)
+        print("Texto da Matéria: ", self.texto_materia )
+        print("Data: "            , self.data_materia)
+        print("Tipo: "            , self.tipo_materia)
+        print("Autor: "           , self.autor       )
+        print("Situaçao: "        , self.situacao    )
+        
         print('************************ Página %d ************************'%i)
 '''
     def navegar_proximo_link(self):
