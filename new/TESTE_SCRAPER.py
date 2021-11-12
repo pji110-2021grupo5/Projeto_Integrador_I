@@ -7,32 +7,48 @@ import re
 #import urllib
 #import json
 
-import mysql.connector
-from mysql.connector import Error
-from requests.models import HTTPError
+#import mysql.connector
+#from mysql.connector import sqlite3.Error
 
+from requests.models import HTTPError
+import sqlite3
 from captura_materias import materias
 
 #*********** Abre a conexão com o Banco de Dados ***********
 class Teste_Scraper:
+    
     def Conexao():
         global cursor
         global con
         try:
-            con = mysql.connector.connect(host='localhost',database='univesp',user='root',password='univesp')
+            con = sqlite3.connect('univesp.db')
+            cursor = con.cursor()
+
+            #con = mysql.connector.connect(host='localhost',database='univesp',user='root',password='root')
             #Cria tabela no Banco MySql
             #nome_vereadores = "CREATE TABLE nome_vereadores(IdVereador int(12) not null,NomeVereador VARCHAR(50) not null,nome_vereador VARCHAR(80),PRIMARY KEY (IdVereador))"
             #part_vereadores = "CREATE TABLE part_vereadores(IdVereador int(12) not null,PartidoVereador VARCHAR(40) not null,GabineteVereador VARCHAR(30),PRIMARY KEY (IdVereador))"
             
             #tables = "SHOW TABLES FROM univesp"
             #Cria cursor e executa SQL no banco
-            cursor = con.cursor()
+            #cursor = con.cursor()
             #cursor.execute(tables)
 
             #tabelas = cursor.fetchall()
 
             #result = [item[0] for item in tabelas]
-
+            #schema = "CREATE SCHEMA IF NOT EXISTS univesp"
+            #cursor.execute(schema)
+            #con.commit()
+            #elif 'nome_vereadores' not in result:
+            nome_vereadores = "CREATE TABLE \
+                               IF NOT EXISTS nome_vereadores\
+                              (IdVereador int(12) not null,\
+                               NomeVereador VARCHAR(50) not null,\
+                               SobreNome VARCHAR(80),\
+                               PRIMARY KEY (IdVereador)) without rowid"
+            cursor.execute(nome_vereadores)
+            con.commit()
             #if 'contato_vereadores' not in result:
             contato_vereadores = "CREATE TABLE \
                                   IF NOT EXISTS contato_vereadores\
@@ -43,27 +59,21 @@ class Teste_Scraper:
                                   Instagram VARCHAR(60),\
                                   Site VARCHAR(130),\
                                   Whats VARCHAR(30),\
-                                  PRIMARY KEY (IdVereador))"
+                                  PRIMARY KEY (IdVereador)) without rowid"
             cursor.execute(contato_vereadores)
-            #elif 'nome_vereadores' not in result:
-            nome_vereadores = "CREATE TABLE \
-                               IF NOT EXISTS nome_vereadores\
-                              (IdVereador int(12) not null,\
-                               NomeVereador VARCHAR(50) not null,\
-                               SobreNome VARCHAR(80),\
-                               PRIMARY KEY (IdVereador))"
-            cursor.execute(nome_vereadores)
+            con.commit()
             #elif 'part_vereadores' not in result:
             part_vereadores = "CREATE TABLE \
                                IF NOT EXISTS part_vereadores\
                                (IdVereador int(12) not null,\
                                 PartidoVereador VARCHAR(40) not null,\
                                 GabineteVereador VARCHAR(30),\
-                                PRIMARY KEY (IdVereador))"
+                                PRIMARY KEY (IdVereador)) without rowid"
             cursor.execute(part_vereadores)
+            con.commit()
             #elif 'materias_vereadores' not in result:
             materias_vereadores = "CREATE TABLE \
-                                   IF NOT EXISTS materias_vereadores(IdMateria int not null AUTO_INCREMENT,\
+                                   IF NOT EXISTS materias_vereadores(IdMateria integer PRIMARY KEY,\
                                    IdVereador int not null,\
                                    TituloMateria VARCHAR(35) not null,\
                                    TextoMateria VARCHAR(200), \
@@ -71,23 +81,23 @@ class Teste_Scraper:
                                    TipoMateria VARCHAR(20),\
                                    AutorMateria VARCHAR(50),\
                                    SituacaoMateria VARCHAR(100),\
-                                   PRIMARY KEY (IdMateria),\
                                    FOREIGN KEY (IdVereador) references nome_vereadores(IdVereador)\
                                                             on Update cascade on delete restrict);"
-            cursor.execute(materias_vereadores)    
+            cursor.execute(materias_vereadores)
+            con.commit()    
             #else:
             #    print('o Banco de dados já possui as tabelas:'+str(result)+' criadas')
-
-        except Error as erro:
+            
+        except sqlite3.Error as erro:
             print('Falha na conexão com o banco de dados: {}'.format(erro))
-
+            exit()
     #*********** Fecha a conexão com o banco de dados ***********
 
     def Fecha_Con():
-        if (con.is_connected()):
+        if con: #(con.is_connected()):
             con.close()
-            cursor.close()
-            print('Conexão MySQL finalizada...')
+            #cursor.close()
+            print('Conexão SQLite finalizada...')
 
 
     #*********** Scraper da página e gravação no banco de dados ***********
@@ -130,19 +140,19 @@ class Teste_Scraper:
                 while data[x] != 'Partido:':
                     sobrenome = sobrenome+data[x]+' '
                     x=x+1
-                insere_nomes = "insert ignore into univesp.nome_vereadores \
+                insere_nomes = "insert or ignore into nome_vereadores \
                                (IdVereador,NomeVereador,SobreNome)\
                                 values ("+str(i+1)+",'"+nome+"','"+sobrenome.strip()+"')"
                 cursor.execute(insere_nomes)
                 con.commit()
 
-                insere_partido="insert ignore into univesp.part_vereadores\
+                insere_partido="insert or ignore into part_vereadores\
                                 (IdVereador,PartidoVereador,GabineteVereador)\
                                 values ("+str(i+1)+",'"+part+"','"+gab+"')"
                 cursor.execute(insere_partido)
                 con.commit()
 
-                insere_contato = "insert ignore into univesp.contato_vereadores \
+                insere_contato = "insert or ignore into contato_vereadores \
                                  (IdVereador,Telefone_gab,"\
                                  "E_mail,Facebook,Instagram,Site,Whats)"\
                                  "values ("+str(i+1)+",'"+tel+"','"+email+"','"+face+\
@@ -151,9 +161,9 @@ class Teste_Scraper:
                 cursor.execute(insere_contato)
                 con.commit()
 
-            except Error as erro:
+            except sqlite3.Error as erro:
                 print('Algo deu errado, erro reportado: {}'.format(erro))
-
+                exit()
             
     def Materias_Vereadores():
 
@@ -216,8 +226,8 @@ class Teste_Scraper:
                         cursor.execute(materias_vereadores)
                         con.commit()
 
-                except Error as erro:
-                    print('Algo deu errado, erro reportado: {}'.format(erro))
+                except sqlite3.Error as erro:
+                    print('Ops ! Algo deu errado, erro reportado: {}'.format(erro))
 
                 #-----------------------------------------------------------------------------    
 
@@ -229,11 +239,12 @@ class Teste_Scraper:
     #Chama a função que faz o Scraper do site ( nomes partidos e contatos dos vereadores )
     Dados_Vereadores()
 
+    #Fecha a conexão com o Banco de Dados
+    Fecha_Con()
+
     #Chama a função que faz o Scraper das matérias ( matérias legislativas )
     #Materias_Vereadores()
     obj = materias()
     obj.Iniciar()
     
-    #Fecha a conexão com o Banco de Dados
     Fecha_Con()
-
