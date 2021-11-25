@@ -1,19 +1,48 @@
+from datetime import datetime
 from flask import Flask
 from markupsafe import escape
 from flask import render_template
+from flask import request
+#from sqlalchemy import SQLAlchemy
+import sqlite3
+from pathlib import Path
 
 
 app = Flask(__name__)
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////univesp.db'
+#db = SQLAlchemy(app)
 
+global materia
 
-@app.route("/")
-def hello_world():
-    return render_template('materias-camara.html')#"<p><h1>Hello, World!</h1></p>"
+def get_db_connection():
+    conn = sqlite3.connect('univesp.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+    
+@app.route("/teste.html",methods=['GET','POST'])
+def vereadores():
+    #self.nome = self.listarnomes()
+    conn = get_db_connection()
+    posts = conn.execute('SELECT * FROM nome_vereadores n\
+                        inner join part_vereadores p on n.IdVereador = p.IdVereador\
+                        inner join contato_vereadores c on n.IdVereador = c.IdVereador').fetchall()
+    conn.close()
+    return render_template('teste.html',vereador=posts)
 
-@app.route('/')
-def index():
-    return 'Index Page'
+@app.route("/materias.html",methods=['GET','POST'])
+def materias():
+    #self.nome = self.listarnomes()
+    conn = get_db_connection()
+    posts = conn.execute('select * from materias_vereadores m\
+                          inner join nome_vereadores n \
+                          on m.IdVereador = n.IdVereador').fetchall()
 
-@app.route("/<name>")
-def hello(name):
-    return f"<h2>Hello, {escape(name)}!</h2>"
+    diretorio = Path('.')
+    arquivo = diretorio/'univesp.db'
+    dt_object = datetime.fromtimestamp(arquivo.stat().st_mtime) 
+
+    materia =  'Matérias Legislativas atualizadas em: '+datetime.strftime(dt_object,'%d/%m/%Y as %H:%M')   
+    conn.close()
+    return render_template('materias.html',materias=posts,mat=materia)
+
+    

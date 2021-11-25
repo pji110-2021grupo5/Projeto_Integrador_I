@@ -10,6 +10,7 @@
  
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
 <!-- Option 1: Bootstrap Bundle with Popper -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script> -->
 
@@ -33,7 +34,7 @@
 
 <div class="col-sm-10 col-xs-16 f-nav wow fadeInDown animated" data-wow-delay="0.5s" data-wow-offset="10">
    <ul class="list-inline ">
-     <li><h2><a href="/">Projeto Integrador I - UNIVESP</a></h2></li>
+     <li><h2><a href="/">Projeto Integrador I - UNIVESP - {{ teste }}</a></h2></li>
    </ul>
 </div>
 
@@ -42,6 +43,19 @@
    <button type="button" class="btn btn-warning">Contato</button>
    <button type="button" class="btn btn-success">Matérias</button>
  </div>
+</div class="container">
+  <table border =2>
+    <tbody>
+      {% for  i in vereador %}
+          <tr>
+              <td>{{ i.IdVereador }}</td>
+              <td>{{ i.NomeVereador }}</td>
+              <td>{{ i.SobreNome }}</td>
+          </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 <!-- header end -->
 <br></br>
 <!-- Footer start -->

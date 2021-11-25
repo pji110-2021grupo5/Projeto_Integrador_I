@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Workflow Câmara Sorocaba</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <title>Quicksearch e bootstrap</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.quicksearch/2.3.1/jquery.quicksearch.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  </head>
+    <body>
+        <div class="wrapper">
+            <div id="banner" class="sticky-header owl-carousel owl-theme">
+                <div class="box item">
+                   <a href="/" target="_parent">
+                     <img class="img-responsive" width="1900" height="340" src="http://161.148.150.207:8085/sitecamara/banners/e1c63928-9976-4878-80dd-4881fadf646c.jpg" alt=""/>
+                   </a>
+                </div>
+            </div>
+            <div class="container">
+                <h1>Projeto Integrador I - UNIVESP</h1>
+                <h2>Workflow das Matérias Legislativas dos Vereadores da Câmara Municipal de Sorocaba-SP</h2>
+                <h3>Acompanhe com facilidade o que os Vereadores de Sorocaba estão fazendo pelo seu bairro</h3>
+            </div>
+            <div class="form-group input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                <input name="consulta" id="txt_consulta" placeholder="Digite o nome do vereador" type="text" class="form-control">
+            </div></br>
+            <table id="data" class="table table-bordered">
+          <thead style="position: sticky;top: 0">
+            <tr>
+              <th>Id</th>  
+              <th>Vereador</th>
+              <th>Partido</th>
+              <th>Gabinete</th>
+              <th>Tel.Gabinete</th>
+              <th>Email</th>
+              <th>Site</th>
+              <!--<th>Facebook</th>
+              <th>Instagram</th>-->
+              <th>Matérias</th>
+            </tr>
+          </thead>
+          <tbody>
+              {% for  i in vereador %}
+              <tr>
+                <td>{{ i.IdVereador }}</td>
+                <td>{{ i.NomeVereador }} {{ i.SobreNome }}</td>
+                <td>{{ i.PartidoVereador }}</td>
+                <td>{{ i.GabineteVereador }}</td>
+                <td>{{ i.Telefone_Gab }}</td>
+                <td>{{ i.E_mail }}</td>
+                <td>{{ i.Site }}</td>
+                <!--<td>{{ i.Facebook }}</td>
+                <td>{{ i.Instagram }}</td>-->
+                <td class="actions">
+                    <a class="btn btn-success btn-xs" Id='btnmat' href="materias.html" value={{ IdVereador }}>Visualizar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+            </table>
+        <script>
+            $('input#txt_consulta').quicksearch('table#data tbody tr');
+        </script>
+    </body>
+</html>
+

@@ -21,7 +21,7 @@ class Teste_Scraper:
         global cursor
         global con
         try:
-            con = sqlite3.connect('univesp.db')
+            con = sqlite3.connect('new/univesp.db')
             cursor = con.cursor()
 
             #con = mysql.connector.connect(host='localhost',database='univesp',user='root',password='root')
