@@ -3,12 +3,17 @@ from flask import Flask
 from markupsafe import escape
 from flask import render_template
 from flask import request
+import os
 #from sqlalchemy import SQLAlchemy
 import sqlite3
 from pathlib import Path
 
 
 app = Flask(__name__)
+
+port = int(os.getenv('PORT'),'5000')
+app.run(host='0.0.0.0',port=port)
+
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////univesp.db'
 #db = SQLAlchemy(app)
 
