@@ -8,9 +8,6 @@ from flask import request
 import sqlite3
 from pathlib import Path
 
-from werkzeug.datastructures import T
-
-
 app = Flask(__name__)
 
 if __name__ == "__main__":
